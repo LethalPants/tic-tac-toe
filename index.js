@@ -1,5 +1,26 @@
 let aiChar, userChar, aiMove, userMove;
 
+const init = (board = [], availableMoves = []) => {
+	board = [
+		['', '', ''],
+		['', '', ''],
+		['', '', ''],
+	];
+
+	for (let i = 0; i < 3; i++) {
+		for (let j = 0; j < 3; j++) {
+			availableMoves.push([j, i]);
+		}
+	}
+};
+
+const play = (currentPlayer) => {
+	let board = [];
+	let availableMoves = [];
+	init(board, availableMoves);
+	console.log(board, availableMoves);
+};
+
 const main = () => {
 	aiChar = Math.round(Math.random());
 	const currentPlayer = 0;
