@@ -1,4 +1,4 @@
-let aiChar, userChar, aiMove, userMove;
+const readline = require('readline');
 
 const init = (board = [], availableMoves = []) => {
 	board = [
@@ -12,6 +12,8 @@ const init = (board = [], availableMoves = []) => {
 			availableMoves.push([j, i]);
 		}
 	}
+
+	return [board, availableMoves];
 };
 
 const checkWinner = (board = []) => {
@@ -59,26 +61,76 @@ const checkWinner = (board = []) => {
 	return winner;
 };
 
-const play = (currentPlayer) => {
-	let board = [];
-	let availableMoves = [];
-	init(board, availableMoves);
-	console.log(board, availableMoves);
+const getCoordinates = () => {
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	});
 
-	let result = '';
+	return new Promise((resolve) =>
+		rl.question('tictactoe> ', (ans) => {
+			rl.close();
+			resolve(ans);
+		}),
+	);
+};
+
+const makeComputerMove = (board, availableMoves) => {
 	let idx = 0,
 		x,
 		y;
+	console.log('The computer will make a move.');
+	idx = Math.floor(Math.random(availableMoves.length));
+	let move = availableMoves.splice(idx, 1)[0];
+	x = move[0];
+	y = move[1];
+	board[x][y] = aiMove;
+};
+
+const processUserMove = (board, availableMoves, move) => {
+	let idx = 0,
+		x = 0,
+		y = 0;
+	if (move.includes('move')) {
+		let cords = move.split(' ')[1].trim().split(',');
+		console.log(cords);
+		x = parseInt(cords[0], 10);
+		y = parseInt(cords[1], 10);
+		if (x > 2 || y > 2) {
+			console.log('Invalid move. Input must be less than 2');
+			return false;
+		}
+		idx = availableMoves.findIndex((a) => a[0] == x && a[1] == y);
+		if (idx == -1) {
+			console.log('The space is already occupied.');
+			return false;
+		}
+		availableMoves.splice(idx, 1);
+		board[x][y] = userMove;
+		return true;
+	}
+	if (move.includes('quit')) {
+		console.log('Thank you for playing!');
+		process.kill(0);
+	}
+};
+
+const play = async (currentPlayer) => {
+	let board = [];
+	let availableMoves = [];
+	[board, availableMoves] = init(board, availableMoves);
+
+	let result = '';
 
 	while (result === '' && availableMoves.length !== 0) {
 		if (currentPlayer === aiChar) {
-			console.log('The computer will make a move.');
-			idx = Math.floor(Math.random(availableMoves.length));
-			let move = availableMoves.splice(index, 1)[0];
-			x = move[0];
-			y = move[1];
-			board[x][y] = aiMove;
+			makeComputerMove(board, availableMoves);
 			currentPlayer = userChar;
+		} else if (currentPlayer == userChar) {
+			console.log('It is your turn to make a move.');
+			const move = await getCoordinates();
+			const next = processUserMove(board, availableMoves, move);
+			if (next) currentPlayer = aiChar;
 		}
 
 		result = checkWinner(board);
@@ -110,6 +162,7 @@ const main = () => {
 	}
 	setTimeout(function () {
 		console.clear();
+		play(currentPlayer);
 	}, 1000);
 };
 
