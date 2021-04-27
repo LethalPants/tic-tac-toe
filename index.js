@@ -1,6 +1,26 @@
 const readline = require('readline');
+const shuffle = require('./utils/shuffle');
 
+let aiChar, userChar, aiMove, userMove;
+
+// generate board, available moves and the first player.
 const init = (board = [], availableMoves = []) => {
+	aiChar = Math.round(Math.random());
+	console.clear();
+	const currentPlayer = 0;
+
+	if (aiChar == 0) {
+		userChar = 1;
+		aiMove = 'X';
+		userMove = 'O';
+		console.log('Computer will make the first move.');
+	} else {
+		userChar = 0;
+		aiMove = 'O';
+		userMove = 'X';
+		console.log('User will make the first move.');
+	}
+
 	board = [
 		['', '', ''],
 		['', '', ''],
@@ -12,6 +32,8 @@ const init = (board = [], availableMoves = []) => {
 			availableMoves.push([j, i]);
 		}
 	}
+	//Shuffling the array for random moves
+	availableMoves = shuffle(availableMoves);
 
 	return [board, availableMoves];
 };
@@ -93,7 +115,6 @@ const processUserMove = (board, availableMoves, move) => {
 		y = 0;
 	if (move.includes('move')) {
 		let cords = move.split(' ')[1].trim().split(',');
-		console.log(cords);
 		x = parseInt(cords[0], 10);
 		y = parseInt(cords[1], 10);
 		if (x > 2 || y > 2) {
@@ -115,11 +136,14 @@ const processUserMove = (board, availableMoves, move) => {
 	}
 };
 
+const printBoard = (board) => {
+	console.table(board);
+};
+
 const play = async (currentPlayer) => {
 	let board = [];
 	let availableMoves = [];
 	[board, availableMoves] = init(board, availableMoves);
-
 	let result = '';
 
 	while (result === '' && availableMoves.length !== 0) {
@@ -132,7 +156,7 @@ const play = async (currentPlayer) => {
 			const next = processUserMove(board, availableMoves, move);
 			if (next) currentPlayer = aiChar;
 		}
-
+		printBoard(board);
 		result = checkWinner(board);
 	}
 
@@ -146,24 +170,7 @@ const play = async (currentPlayer) => {
 };
 
 const main = () => {
-	aiChar = Math.round(Math.random());
-	const currentPlayer = 0;
-
-	if (aiChar == 0) {
-		userChar = 1;
-		aiMove = 'X';
-		userMove = 'O';
-		console.log('Computer will make the first move.');
-	} else {
-		userChar = 0;
-		aiMove = 'O';
-		userMove = 'X';
-		console.log('User will make the first move.');
-	}
-	setTimeout(function () {
-		console.clear();
-		play(currentPlayer);
-	}, 1000);
+	play(0);
 };
 
 main();
