@@ -2,8 +2,10 @@
 
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-### To run
+![demo-gif](https://user-images.githubusercontent.com/48921721/116416216-d7659a00-a842-11eb-9e79-93cb2d957a70.gif)
 
+
+### To run
 ```sh
   node index.js
 ```
